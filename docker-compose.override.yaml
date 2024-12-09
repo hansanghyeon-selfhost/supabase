@@ -1,0 +1,30 @@
+networks:
+  traefik_proxy:
+    external: true
+
+name: supabase
+
+services:
+  kong:
+    ports: []
+    networks:
+      - default
+      - traefik_proxy
+    labels:
+      - traefik.enable=true
+      ## HTTP Routers
+      - traefik.http.routers.${SERVICE}-http.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.${SERVICE}-http.entrypoints=web
+      - traefik.http.routers.${SERVICE}-http.middlewares=http2https@file
+      ## HTTP Routers
+      - traefik.http.routers.${SERVICE}.entrypoints=webs
+      - traefik.http.routers.${SERVICE}.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.${SERVICE}.tls.certresolver=leresolver
+      - traefik.http.services.${SERVICE}.loadbalancer.server.port=8000
+
+  analytics:
+    ports: []
+
+  # Update the DATABASE_URL if you are using an external Postgres database
+  supavisor:
+    ports: []
